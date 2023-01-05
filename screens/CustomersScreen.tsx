@@ -8,16 +8,20 @@ import { RootStackParamsList } from '../navigation/RootStack';
 import { TabStackParamsList } from '../navigation/TabNavigator';
 import FrontImg from "../assets/pic-1.jpeg";
 import { Input } from '@rneui/themed';
+import { GET_CUSTOMERS } from '../graphql/queries';
+import { useQuery } from "@apollo/client";
+import { CustomerCard } from '../components';
 
-export type CustomerScreenParamsList = CompositeNavigationProp<
+export type CustomersScreenNavigationProps = CompositeNavigationProp<
   BottomTabNavigationProp<TabStackParamsList>,
   NativeStackNavigationProp<RootStackParamsList>
 >
 
 const CustomersScreen = () => {
   const [input, setInput] = useState<string>("");
+  const { loading, error, data } = useQuery(GET_CUSTOMERS);
 
-  const navigation = useNavigation<CustomerScreenParamsList>();
+  const navigation = useNavigation<CustomersScreenNavigationProps>();
 
   const tw = useTailwind();
 
@@ -42,6 +46,10 @@ const CustomersScreen = () => {
         onChangeText={setInput}
         containerStyle={tw(`bg-white px-10 pt-5 pb-0`)}
       />
+
+      {data?.getCustomers.map(({ name: ID, value: { email, name } }: CustomerResponse) => (
+        <CustomerCard key={ID} name={name} email={email} user_id={ID} />
+      ))}
     </ScrollView>
   )
 }
